@@ -1,0 +1,87 @@
+###### clean csv files and names ###
+
+cd home/idish/internship/ibtissam/alignement/Diplostraca/Results/Separate.Align/Trim_alignment_macse
+
+
+for file in *_trimmed.fas; do   mv "$file" "${file/_trimmed/}"; done
+
+rm *.csv
+
+
+#### Tree ####
+
+###Dont be in the same folder of the input!
+
+## in R
+
+library(regPhylo)
+
+input_folder <- "~/internship/ibtissam/alignement/Diplostraca/Results/Separate.Align/Trim_alignment_macse"
+output_folder <- "~/internship/ibtissam/alignement/Diplostraca/Results/Separate.Align/Tree/File_backup"
+
+if (!dir.exists(output_folder)) {
+  dir.create(output_folder, recursive = TRUE)
+}
+
+
+fasta_files <- list.files(input_folder, pattern = "\\.fas$", full.names = TRUE)
+
+
+
+Align.Concat(input = input_folder,
+             outputConcat = paste0(output_folder, "/Concat"),
+             split = "_",
+             Seq.Name.Identical = FALSE,
+             chunk.names.to.Keep = 1,
+             Parti.nexus = TRUE)
+
+
+
+
+source("~/internship/ibtissam/alignement/Scripts/Diplostraca/Split.Codon.Partition.R")
+
+Split.Codon.Partition(input.parti = paste0(output_folder, "/Partitions_Concat.nex"),
+                      which.codon = seq(1, 13),
+                      output.parti = paste0(output_folder, "/Partitions_Concat_3codons.nex"))
+
+
+
+
+### clean Concat fasta file from ! ######
+
+# in bash
+
+cd home/idich/internship/ibtissam/alignement/Diplostraca/Results/Separate.Align/Tree/File_backup
+sed 's/!/-/g' Concat.fas > Concat.tris.fas
+
+
+###### find partition ######
+
+# in R
+
+source("~/internship/ibtissam/alignement/Scripts/Diplostraca/IQ_PartFinder.R")
+
+IQ_PartFinder(
+  path.input = "Tree/File_backup",
+  input.al = "Concat.tris.fas",
+  input.part = "Partitions_Concat_3codons.nex",
+  m = "TESTMERGEONLY",
+  mset = NULL,
+  Threads = "AUTO",
+  ntmax = 4,
+  merge = "rclusterf",
+  merit = "BIC"
+)
+
+##### Tree construction ######
+
+# in bash 
+
+iqtree2 -s Concat.tris.fas \
+        -p Partitions_Concat_3codons.nex.best_scheme.nex \
+        -T 13 \
+        -B 1000 \
+        --bnni \
+        -alrt 1000
+
+

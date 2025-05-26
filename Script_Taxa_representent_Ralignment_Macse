@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Activate the macse conda environment
+source /opt/src/miniforge3/etc/profile.d/conda.sh
+conda activate macse
+
+# Define input and output directories
+INPUT_DIR="/home/idich/internship/ibtissam/tree/AllGroups_GeneWise_DESALIGNED"
+OUTPUT_DIR="/home/idich/internship/ibtissam/tree/AllGroups_GeneWise_MACSE"
+
+# Create the output directory if it doesn't exist
+mkdir -p "${OUTPUT_DIR}"
+
+# Job list file
+JOB_LIST="macse_jobs.list"
+rm -f "$JOB_LIST"  # Clean up old job list if it exists
+
+# Generate alignment commands
+for SEQ in "$INPUT_DIR"/*.fas; do
+    echo "Processing $(basename "$SEQ")"
+
+    GENE_NAME=$(basename "$SEQ" .fas)
+    OUTPUT_FILE="${OUTPUT_DIR}/${GENE_NAME}.fas"
+
+    # Append MACSE command to job list
+    echo "macse -prog alignSequences -seq $SEQ -gc_def 5 -out_NT $OUTPUT_FILE" >> "$JOB_LIST"
+done
+
+# Run all jobs in parallel
+cat "$JOB_LIST" | parallel -j 10 --eta
+
+echo "✅ MACSE re-alignment completed for all de-aligned gene files."
+

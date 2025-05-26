@@ -1,0 +1,33 @@
+input_folder <- "~/internship/ibtissam/tree/AllGroups_GeneWise_DESALIGNED/"
+
+output_folder <- "~/internship/ibtissam/tree/File_backup_AA"
+
+if (!dir.exists(output_folder)) { 
+  dir.create(output_folder, recursive = TRUE)
+}
+
+fasta_files <- list.files(input_folder, pattern = "\\.fas$", full.names = TRUE)
+
+Align.Concat(
+  input = input_folder,
+  outputConcat = paste0(output_folder, "/Concat_AA"),
+  split = "_",
+  Seq.Name.Identical = FALSE,
+  chunk.names.to.Keep = 1,
+  Parti.nexus = TRUE
+)
+
+cd ~/internship/ibtissam/tree/File_backup_AA
+sed 's/!/-/g' Concat_AA.fas > Concat_AA.tris.fas
+
+
+
+
+iqtree2 -s Concat_AA.tris.fas \
+        -p Partitions_Concat.nex \
+        -m MFP+MERGE \
+        -T 13 \
+        -B 1000 \
+        --bnni \
+        -alrt 1000 \
+        -st AA
