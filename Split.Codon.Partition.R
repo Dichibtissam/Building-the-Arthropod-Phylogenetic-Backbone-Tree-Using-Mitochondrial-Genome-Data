@@ -1,3 +1,4 @@
+#Function developed by David Eme
 #' @title Add the three codons position to the partition file in nexus format 
 
 #' @description This function use the 'Partition_Concat.nex' file provided by the 
