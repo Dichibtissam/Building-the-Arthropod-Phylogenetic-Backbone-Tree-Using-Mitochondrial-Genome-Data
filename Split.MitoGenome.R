@@ -1,3 +1,4 @@
+#Function developed by David Eme
 #' @title function to Split the wholemitogenomes into x different fasta alignment belonging to the x gene region of interests.  
 
 #' @description This function exports a separate alignement in fasta format for each gene region of interest from a single long DNA sequence (e.g. a mitogenome).
