@@ -1,3 +1,4 @@
+## Function developed by David Eme
 #' @title Estimate the best number of partitions and substitution model for each partition: wrapper for PartitionFinder implemented in IQtree2
 
 #' @description This function is a wrapper running PartitionFinder (Lanfear et al. 2017) implemented in IQtree2 to estimate the best number of partitions and their best associated substitution models.
